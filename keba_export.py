@@ -2,6 +2,7 @@ import json
 import os
 import socket
 import csv
+import datetime
 from flask import Flask, send_file
 #import pandas as pd
 
@@ -83,6 +84,14 @@ def keba_updatereports(sock, data):
         energy = int(report['E pres']) / 10000
         report['Energy in kWh'] = str(round(energy,2)).replace('.',',')
         report['Price in Euro']= str(round(energy * _Price, 2)).replace('.',',')
+        try:
+            report['Year'] = datetime.datetime.strptime(report['started'], '%Y-%m-%d %H:%M:%S.%f').year
+        except:
+            report['Year'] = 0 
+        try: 
+            report['Month'] = datetime.datetime.strptime(report['started'], '%Y-%m-%d %H:%M:%S.%f').month
+        except:
+            report['Month'] = 0 
         print(report)
         report.pop('ID')
         cur_sessionid = report['Session ID']
