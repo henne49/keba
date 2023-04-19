@@ -1,13 +1,16 @@
 import json
 import os
 import socket
-from flask import Flask
 import csv
+from flask import Flask, send_file
+#import pandas as pd
 
 _KEBA_WALLBOX_IP = "***REMOVED***"
 _KEBA_WALLBOX_PORT = 7090
 _KEBA_WALLBOX_ADDR = (_KEBA_WALLBOX_IP,_KEBA_WALLBOX_PORT)
 _KEBA_JSON_FILE = "c-keba.json"
+_KEBA_CSV_FILE = "c-keba-export.csv"
+_Price = 0.49
 
 app = Flask(__name__)
 
@@ -28,15 +31,12 @@ def data_save(data):
         json.dump(data, fp, indent=4)
 
 def data_save_csv(history_json):
-    data_file = open('c-keba-export.csv', 'w')
+    data_file = open(_KEBA_CSV_FILE, 'w')
     data = history_json['history']
 
-    #print(data.keys())
-
     count=1
-    csv_writer = csv.writer(data_file)
+    csv_writer = csv.writer(data_file, dialect='excel', delimiter=';')
     for r in sorted(data.keys()):
-        #print(r)
         if count == 1:
             header = data[str(r)].keys()
             csv_writer.writerow(header)
@@ -78,8 +78,12 @@ def keba_updatereports(sock, data):
     """updates data dict with latest reports"""
     for r in range(101, 131):
         report = keba_getreport(sock,r)
-        #print(report)
+        
         report['Car']=car_rfids[report['RFID tag']]
+        energy = int(report['E pres']) / 10000
+        report['Energy in kWh'] = str(round(energy,2)).replace('.',',')
+        report['Price in Euro']= str(round(energy * _Price, 2)).replace('.',',')
+        print(report)
         report.pop('ID')
         cur_sessionid = report['Session ID']
         if cur_sessionid == -1: 
@@ -87,9 +91,15 @@ def keba_updatereports(sock, data):
         data['history']["%d" % cur_sessionid]=report
 
 @app.route('/')
-# ‘/’ URL is bound with hello_world() function.
-def hello_world():
-    return 'Hello World'
+# ‘/’ URL is bound with Keba Version
+def startpage():
+    keba_ver = keba_getversion(sock)
+    return f"Keba Wallbox version: {keba_ver}"
+
+# Sending the file to the user
+@app.route('/download')
+def download():
+   return send_file(_KEBA_CSV_FILE, as_attachment=True)
 
 @app.route('/update')
 def web_update():
@@ -107,5 +117,6 @@ if __name__ == "__main__":
     data_save(data)
     print(len(data['history']))
     data_save_csv(data)
-
-    #app.run()
+#    data = pd.read_csv(r"_KEBA_CSV_FILE", sep = ';', decimal = '.')
+#    data.to_csv('foo.csv', decimal = ',', sep = ';', index = False)
+    app.run()
