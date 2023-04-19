@@ -11,6 +11,13 @@ _KEBA_JSON_FILE = "c-keba.json"
 
 app = Flask(__name__)
 
+car_rfids = {
+    '0000000000000000' : '***REMOVED***',
+    '***REMOVED***' : '***REMOVED***',
+    '***REMOVED***' : '***REMOVED*** - Master',
+    '34d8ee3100000001' : '***REMOVED***'
+}
+
 def data_load():
     with open(_KEBA_JSON_FILE, 'r') as fp:
         return json.load(fp)
@@ -23,19 +30,23 @@ def data_save(data):
 def data_save_csv(history_json):
     data_file = open('c-keba-export.csv', 'w')
     data = history_json['history']
+
+    #print(data.keys())
+
     count=1
     csv_writer = csv.writer(data_file)
-    for r in data:
+    for r in sorted(data.keys()):
+        #print(r)
         if count == 1:
-            header = data[str(count)].keys()
+            header = data[str(r)].keys()
             csv_writer.writerow(header)
-        csv_writer.writerow(data[str(count)].values())
+        csv_writer.writerow(data[str(r)].values())
         count += 1
 
 def init_socket():
     # Create a UDP socket and bind to ANY
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    server_address = ('0.0.0.0', _KEBA_WALLBOX_PORT)
+    server_address = ('0.0.0.0', _KEBA_WALLBOX_PORT) 
     s.bind(server_address)
     return s
 
@@ -67,10 +78,12 @@ def keba_updatereports(sock, data):
     """updates data dict with latest reports"""
     for r in range(101, 131):
         report = keba_getreport(sock,r)
-        print(report)
+        #print(report)
+        report['Car']=car_rfids[report['RFID tag']]
         report.pop('ID')
         cur_sessionid = report['Session ID']
-        if cur_sessionid == -1: continue
+        if cur_sessionid == -1: 
+            continue
         data['history']["%d" % cur_sessionid]=report
 
 @app.route('/')
@@ -95,4 +108,4 @@ if __name__ == "__main__":
     print(len(data['history']))
     data_save_csv(data)
 
-    app.run()
+    #app.run()
