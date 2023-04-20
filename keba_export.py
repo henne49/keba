@@ -11,16 +11,19 @@ _KEBA_WALLBOX_PORT = 7090
 _KEBA_WALLBOX_ADDR = (_KEBA_WALLBOX_IP,_KEBA_WALLBOX_PORT)
 _KEBA_JSON_FILE = "c-keba.json"
 _KEBA_CSV_FILE = "c-keba-export.csv"
+_KEBA_CISCO_CSV_FILE = "***REMOVED***-keba-export.csv"
 _Price = 0.49
 
 app = Flask(__name__)
 
 car_rfids = {
     '0000000000000000' : '***REMOVED***',
-    '***REMOVED***' : '***REMOVED*** 1P',
-    '***REMOVED***' : '***REMOVED*** 3P',
-    '***REMOVED***' : '***REMOVED*** - Master',
+    '***REMOVED***' : '***REMOVED***',
+    '***REMOVED***' : '***REMOVED***',
+    '***REMOVED***' : '***REMOVED***',
+    '***REMOVED***' : '***REMOVED***',
     '34d8ee3100000001' : '***REMOVED***'
+
 }
 
 def data_load():
@@ -34,15 +37,30 @@ def data_save(data):
 
 def data_save_csv(history_json):
     data_file = open(_KEBA_CSV_FILE, 'w')
+    data_file_***REMOVED*** = open(_KEBA_CISCO_CSV_FILE, 'w')
     data = history_json['history']
-
+    data_***REMOVED*** = data = history_json['history']
     count=1
     csv_writer = csv.writer(data_file, dialect='excel', delimiter=';')
+    csv_writer_***REMOVED*** = csv.writer(data_file_***REMOVED***, dialect='excel', delimiter=';')
     for r in sorted(data.keys()):
+        data_***REMOVED***[str(r)].pop('Curr HW')
+        data_***REMOVED***[str(r)].pop('started[s]')
+        data_***REMOVED***[str(r)].pop('ended[s]')
+        data_***REMOVED***[str(r)].pop('reason')
+        data_***REMOVED***[str(r)].pop('timeQ')
+        data_***REMOVED***[str(r)].pop('RFID tag')
+        data_***REMOVED***[str(r)].pop('RFID class')
+        data_***REMOVED***[str(r)].pop('Sec')
+
         if count == 1:
             header = data[str(r)].keys()
+            header_***REMOVED*** = data_***REMOVED***[str(r)].keys()
             csv_writer.writerow(header)
+            csv_writer_***REMOVED***.writerow(header_***REMOVED***)
         csv_writer.writerow(data[str(r)].values())
+        if int(data_***REMOVED***[str(r)]['E pres']) > 200 and data_***REMOVED***[str(r)]['Car'] is '***REMOVED***': 
+            csv_writer_***REMOVED***.writerow(data_***REMOVED***[str(r)].values())
         count += 1
 
 def init_socket():
@@ -81,7 +99,12 @@ def keba_updatereports(sock, data):
     for r in range(101, 131):
         report = keba_getreport(sock,r)
         
-        report['Car']=car_rfids[report['RFID tag']]
+        try: 
+            report['Car']=car_rfids[report['RFID tag']]
+        except:
+            report['Car']= 'unknown'
+
+        
         energy = int(report['E pres']) / 10000
         report['Energy in kWh'] = str(round(energy,2)).replace('.',',')
         report['Price in Euro']= str(round(energy * _Price, 2)).replace('.',',')
@@ -106,7 +129,8 @@ def startpage():
     keba_ver = keba_getversion(sock)
     output = "<p>Keba Report Downloader</p>"
     output = output + f"Keba Wallbox version: {keba_ver}"
-    output = output + '<br><a href="http://127.0.0.1:5000/download">Download</a>'
+    output = output + '<br><a href="http://127.0.0.1:5000/download">Download Full</a>'
+    output = output + '<br><a href="http://127.0.0.1:5000/download***REMOVED***">Download ***REMOVED***</a>'
     output = output + '<br><a href="http://127.0.0.1:5000/update">Update</a>'
 
     return output
@@ -115,6 +139,10 @@ def startpage():
 @app.route('/download')
 def download():
    return send_file(_KEBA_CSV_FILE, as_attachment=True)
+
+@app.route('/download***REMOVED***')
+def download***REMOVED***():
+   return send_file(_KEBA_CISCO_CSV_FILE, as_attachment=True)
 
 @app.route('/update')
 def web_update():
@@ -134,6 +162,4 @@ if __name__ == "__main__":
     data_save(data)
     print(len(data['history']))
     data_save_csv(data)
-#    data = pd.read_csv(r"_KEBA_CSV_FILE", sep = ';', decimal = '.')
-#    data.to_csv('foo.csv', decimal = ',', sep = ';', index = False)
     app.run()
