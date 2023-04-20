@@ -17,7 +17,8 @@ app = Flask(__name__)
 
 car_rfids = {
     '0000000000000000' : '***REMOVED***',
-    '***REMOVED***' : '***REMOVED***',
+    '***REMOVED***' : '***REMOVED*** 1P',
+    '***REMOVED***' : '***REMOVED*** 3P',
     '***REMOVED***' : '***REMOVED*** - Master',
     '34d8ee3100000001' : '***REMOVED***'
 }
@@ -103,7 +104,12 @@ def keba_updatereports(sock, data):
 # ‘/’ URL is bound with Keba Version
 def startpage():
     keba_ver = keba_getversion(sock)
-    return f"Keba Wallbox version: {keba_ver}"
+    output = "<p>Keba Report Downloader</p>"
+    output = output + f"Keba Wallbox version: {keba_ver}"
+    output = output + '<br><a href="http://127.0.0.1:5000/download">Download</a>'
+    output = output + '<br><a href="http://127.0.0.1:5000/update">Update</a>'
+
+    return output
 
 # Sending the file to the user
 @app.route('/download')
@@ -114,7 +120,9 @@ def download():
 def web_update():
     keba_updatereports(sock, data)
     data_save(data)
-    return "Reports: %d" % (len(data['history']))
+    output = "Reports: %d" % (len(data['history']))
+    output = output + '<br><a href="http://127.0.0.1:5000/">Back</a>'
+    return output
 
 if __name__ == "__main__":
     global sock, data
