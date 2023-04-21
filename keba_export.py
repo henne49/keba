@@ -22,7 +22,7 @@ car_rfids = {
     '***REMOVED***' : '***REMOVED***',
     '***REMOVED***' : '***REMOVED***',
     '***REMOVED***' : '***REMOVED***',
-    '34d8ee3100000001' : '***REMOVED***'
+    '***REMOVED***' : '***REMOVED***'
 
 }
 
@@ -39,29 +39,37 @@ def data_save_csv(history_json):
     data_file = open(_KEBA_CSV_FILE, 'w')
     data_file_***REMOVED*** = open(_KEBA_CISCO_CSV_FILE, 'w')
     data = history_json['history']
-    data_***REMOVED*** = data = history_json['history']
+    data_***REMOVED*** = data = history_json['history'].copy()
     count=1
     csv_writer = csv.writer(data_file, dialect='excel', delimiter=';')
     csv_writer_***REMOVED*** = csv.writer(data_file_***REMOVED***, dialect='excel', delimiter=';')
+    
+    
     for r in sorted(data.keys()):
-        data_***REMOVED***[str(r)].pop('Curr HW')
-        data_***REMOVED***[str(r)].pop('started[s]')
-        data_***REMOVED***[str(r)].pop('ended[s]')
-        data_***REMOVED***[str(r)].pop('reason')
-        data_***REMOVED***[str(r)].pop('timeQ')
-        data_***REMOVED***[str(r)].pop('RFID tag')
-        data_***REMOVED***[str(r)].pop('RFID class')
-        data_***REMOVED***[str(r)].pop('Sec')
-
         if count == 1:
             header = data[str(r)].keys()
-            header_***REMOVED*** = data_***REMOVED***[str(r)].keys()
             csv_writer.writerow(header)
-            csv_writer_***REMOVED***.writerow(header_***REMOVED***)
         csv_writer.writerow(data[str(r)].values())
+        count += 1
+    count = 1
+    for r in sorted(data.keys()):
+        if 'Curr HW' in data_***REMOVED***[str(r)]:
+            data_***REMOVED***[str(r)].pop('Curr HW')
+            data_***REMOVED***[str(r)].pop('started[s]')
+            data_***REMOVED***[str(r)].pop('ended[s]')
+            data_***REMOVED***[str(r)].pop('reason')
+            data_***REMOVED***[str(r)].pop('timeQ')
+            data_***REMOVED***[str(r)].pop('RFID tag')
+            data_***REMOVED***[str(r)].pop('RFID class')
+            data_***REMOVED***[str(r)].pop('Sec')
+        if count == 1:
+            header_***REMOVED*** = data_***REMOVED***[str(r)].keys()
+            csv_writer_***REMOVED***.writerow(header_***REMOVED***)
         if int(data_***REMOVED***[str(r)]['E pres']) > 200 and data_***REMOVED***[str(r)]['Car'] is '***REMOVED***': 
             csv_writer_***REMOVED***.writerow(data_***REMOVED***[str(r)].values())
         count += 1
+
+
 
 def init_socket():
     # Create a UDP socket and bind to ANY
