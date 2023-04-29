@@ -54,22 +54,19 @@ def data_save_csv(history_json):
     csv_writer = csv.writer(data_file, dialect='excel', delimiter=';')
     csv_writer_***REMOVED*** = csv.writer(data_file_***REMOVED***, dialect='excel', delimiter=';')
      
-    
-    for r in sorted(data.keys()):
+    #print(sorted(data.keys(),key=int), reverse=True)
+    for r in sorted(data.keys(), key=int, reverse=True):
         if count == 1:
             header = data[str(r)].keys()
             table_headings = header
             csv_writer.writerow(header)
             table_data = []
-            if int(data[str(r)]['E pres']) > 200:
-                table_data.append(data[str(r)].values())
-            print(table_data)
         csv_writer.writerow(data[str(r)].values())
         if int(data[str(r)]['E pres']) > 200:
             table_data.append(data[str(r)].values())
         count += 1
     count = 1
-    for r in sorted(data.keys()):
+    for r in sorted(data.keys(), key=int, reverse=True):
         if 'Curr HW' in data_***REMOVED***[str(r)]:
             data_***REMOVED***[str(r)].pop('Curr HW')
             data_***REMOVED***[str(r)].pop('started[s]')
@@ -85,7 +82,7 @@ def data_save_csv(history_json):
         if int(data_***REMOVED***[str(r)]['E pres']) > 200 and data_***REMOVED***[str(r)]['Car'] is '***REMOVED***': 
             csv_writer_***REMOVED***.writerow(data_***REMOVED***[str(r)].values())
         count += 1
-
+    #table_data.sort(key=lambda x: x[0]['Session ID'], reverse=True)
 
 
 def init_socket():
@@ -193,4 +190,4 @@ if __name__ == "__main__":
     data_save(data)
     print(len(data['history']))
     data_save_csv(data)
-    app.run()
+    app.run(host='0.0.0.0',port='5050')
