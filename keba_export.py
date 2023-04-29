@@ -151,10 +151,10 @@ def startpage():
     keba_ver = keba_getversion(sock)
     output = "<p>Keba Report Downloader</p>"
     output = output + f"Keba Wallbox version: {keba_ver}"
-    output = output + '<br><a href="http://127.0.0.1:5000/download">Download Full</a>'
-    output = output + '<br><a href="http://127.0.0.1:5000/download***REMOVED***">Download ***REMOVED***</a>'
-    output = output + '<br><a href="http://127.0.0.1:5000/update">Update</a>'
-    output = output + '<br><a href="http://127.0.0.1:5000/table">Show Table</a>'
+    output = output + '<br><a href="http://localhost:5050/download">Download Full</a>'
+    output = output + '<br><a href="http://localhost:5050/download***REMOVED***">Download ***REMOVED***</a>'
+    output = output + '<br><a href="http://localhost:5050/update">Update</a>'
+    output = output + '<br><a href="http://localhost:5050/table">Show Table</a>'
     return output
 
 # Sending the file to the user
@@ -176,7 +176,7 @@ def web_update():
     keba_updatereports(sock, data)
     data_save(data)
     output = "Reports: %d" % (len(data['history']))
-    output = output + '<br><a href="http://127.0.0.1:5000/">Back</a>'
+    output = output + '<br><a href="http://localhost:5050/">Back</a>'
 
     return output
 
