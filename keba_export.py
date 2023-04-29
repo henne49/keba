@@ -3,7 +3,7 @@ import os
 import socket
 import csv
 import datetime
-from flask import Flask, send_file
+from flask import Flask, send_file, render_template
 #import pandas as pd
 
 _KEBA_WALLBOX_IP = "***REMOVED***"
@@ -26,6 +26,13 @@ car_rfids = {
 
 }
 
+# table_headings = ("Heading1")
+# table_data = (
+#     ("1"),
+#     ("2")
+# )
+
+
 def data_load():
     with open(_KEBA_JSON_FILE, 'r') as fp:
         return json.load(fp)
@@ -36,6 +43,9 @@ def data_save(data):
         json.dump(data, fp, indent=4)
 
 def data_save_csv(history_json):
+    global table_headings
+    global table_data
+    
     data_file = open(_KEBA_CSV_FILE, 'w')
     data_file_***REMOVED*** = open(_KEBA_CISCO_CSV_FILE, 'w')
     data = history_json['history']
@@ -43,13 +53,20 @@ def data_save_csv(history_json):
     count=1
     csv_writer = csv.writer(data_file, dialect='excel', delimiter=';')
     csv_writer_***REMOVED*** = csv.writer(data_file_***REMOVED***, dialect='excel', delimiter=';')
-    
+     
     
     for r in sorted(data.keys()):
         if count == 1:
             header = data[str(r)].keys()
+            table_headings = header
             csv_writer.writerow(header)
+            table_data = []
+            if int(data[str(r)]['E pres']) > 200:
+                table_data.append(data[str(r)].values())
+            print(table_data)
         csv_writer.writerow(data[str(r)].values())
+        if int(data[str(r)]['E pres']) > 200:
+            table_data.append(data[str(r)].values())
         count += 1
     count = 1
     for r in sorted(data.keys()):
@@ -140,7 +157,7 @@ def startpage():
     output = output + '<br><a href="http://127.0.0.1:5000/download">Download Full</a>'
     output = output + '<br><a href="http://127.0.0.1:5000/download***REMOVED***">Download ***REMOVED***</a>'
     output = output + '<br><a href="http://127.0.0.1:5000/update">Update</a>'
-
+    output = output + '<br><a href="http://127.0.0.1:5000/table">Show Table</a>'
     return output
 
 # Sending the file to the user
@@ -152,12 +169,18 @@ def download():
 def download***REMOVED***():
    return send_file(_KEBA_CISCO_CSV_FILE, as_attachment=True)
 
+@app.route('/table')
+def table():
+    return render_template("table.html", headings=table_headings, data=table_data)
+#https://www.youtube.com/watch?v=mCy52I4exTU
+
 @app.route('/update')
 def web_update():
     keba_updatereports(sock, data)
     data_save(data)
     output = "Reports: %d" % (len(data['history']))
     output = output + '<br><a href="http://127.0.0.1:5000/">Back</a>'
+
     return output
 
 if __name__ == "__main__":
