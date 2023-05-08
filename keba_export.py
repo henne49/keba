@@ -22,8 +22,8 @@ car_rfids = {
     '***REMOVED***' : '***REMOVED***',
     '***REMOVED***' : '***REMOVED***',
     '***REMOVED***' : '***REMOVED***',
+    '***REMOVED***' : '***REMOVED***',
     '***REMOVED***' : '***REMOVED***'
-
 }
 
 # table_headings = ("Heading1")
@@ -79,6 +79,7 @@ def data_save_csv(history_json):
         if count == 1:
             header_***REMOVED*** = data_***REMOVED***[str(r)].keys()
             csv_writer_***REMOVED***.writerow(header_***REMOVED***)
+        #Write in CSV File for ***REMOVED***
         if int(data_***REMOVED***[str(r)]['E pres']) > 200 and data_***REMOVED***[str(r)]['Car'] is '***REMOVED***': 
             csv_writer_***REMOVED***.writerow(data_***REMOVED***[str(r)].values())
         count += 1
@@ -151,10 +152,10 @@ def startpage():
     keba_ver = keba_getversion(sock)
     output = "<p>Keba Report Downloader</p>"
     output = output + f"Keba Wallbox version: {keba_ver}"
-    output = output + '<br><a href="http://localhost:5050/download">Download Full</a>'
-    output = output + '<br><a href="http://localhost:5050/download***REMOVED***">Download ***REMOVED***</a>'
-    output = output + '<br><a href="http://localhost:5050/update">Update</a>'
-    output = output + '<br><a href="http://localhost:5050/table">Show Table</a>'
+    output = output + '<br><a href="./download">Download Full</a>'
+    output = output + '<br><a href="./download***REMOVED***">Download ***REMOVED***</a>'
+    output = output + '<br><a href="./update">Update</a>'
+    output = output + '<br><a href="./table">Show Table</a>'
     return output
 
 # Sending the file to the user
@@ -175,8 +176,9 @@ def table():
 def web_update():
     keba_updatereports(sock, data)
     data_save(data)
+    data_save_csv(data)
     output = "Reports: %d" % (len(data['history']))
-    output = output + '<br><a href="http://localhost:5050/">Back</a>'
+    output = output + '<br><a href="./">Back</a>'
 
     return output
 
