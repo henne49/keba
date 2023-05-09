@@ -67,22 +67,13 @@ def data_save_csv(history_json):
         count += 1
     count = 1
     for r in sorted(data.keys(), key=int, reverse=True):
-        if 'Curr HW' in data_***REMOVED***[str(r)]:
-            data_***REMOVED***[str(r)].pop('Curr HW')
-            data_***REMOVED***[str(r)].pop('started[s]')
-            data_***REMOVED***[str(r)].pop('ended[s]')
-            data_***REMOVED***[str(r)].pop('reason')
-            data_***REMOVED***[str(r)].pop('timeQ')
-            data_***REMOVED***[str(r)].pop('RFID tag')
-            data_***REMOVED***[str(r)].pop('RFID class')
-            data_***REMOVED***[str(r)].pop('Sec')
         if count == 1:
             header_***REMOVED*** = data_***REMOVED***[str(r)].keys()
             csv_writer_***REMOVED***.writerow(header_***REMOVED***)
         #Write in CSV File for ***REMOVED***
-        if int(data_***REMOVED***[str(r)]['E pres']) > 200 and data_***REMOVED***[str(r)]['Car'] is '***REMOVED***': 
+        if (int(data_***REMOVED***[str(r)]['E pres']) > 200) and ('***REMOVED***' in data_***REMOVED***[str(r)]['Car']):
             csv_writer_***REMOVED***.writerow(data_***REMOVED***[str(r)].values())
-        count += 1
+        $count += 1
     #table_data.sort(key=lambda x: x[0]['Session ID'], reverse=True)
 
 
@@ -127,10 +118,18 @@ def keba_updatereports(sock, data):
         except:
             report['Car']= 'unknown'
 
-        
+        report.pop('Curr HW')
+        report.pop('started[s]')
+        report.pop('ended[s]')
+        report.pop('reason')
+        report.pop('timeQ')
+        report.pop('RFID tag')
+        report.pop('RFID class')
+        report.pop('Sec')
+
         energy = int(report['E pres']) / 10000
         report['Energy in kWh'] = str(round(energy,2)).replace('.',',')
-        report['Price in Euro']= str(round(energy * _Price, 2)).replace('.',',')
+        report['Price in Euro'] = str(round(energy * _Price, 2)).replace('.',',')
         try:
             report['Year'] = datetime.datetime.strptime(report['started'], '%Y-%m-%d %H:%M:%S.%f').year
         except:
