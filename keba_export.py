@@ -73,7 +73,7 @@ def data_save_csv(history_json):
         #Write in CSV File for ***REMOVED***
         if (int(data_***REMOVED***[str(r)]['E pres']) > 200) and ('***REMOVED***' in data_***REMOVED***[str(r)]['Car']):
             csv_writer_***REMOVED***.writerow(data_***REMOVED***[str(r)].values())
-        $count += 1
+        count += 1
     #table_data.sort(key=lambda x: x[0]['Session ID'], reverse=True)
 
 
