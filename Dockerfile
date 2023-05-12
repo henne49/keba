@@ -7,7 +7,7 @@ WORKDIR /app
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 
-COPY keba_export.py keba_export.py
+COPY app.py app.py
 COPY template.json c-keba.json
 
-CMD ["python3", "keba_export.py"]
+CMD ["python3", "-m" , "flask", "run", "--host=0.0.0.0"]
