@@ -153,6 +153,10 @@ def download():
 def download***REMOVED***():
    return send_file(_KEBA_CISCO_CSV_FILE, as_attachment=True)
 
+@app.route('/downloadJson')
+def download***REMOVED***():
+   return send_file(_KEBA_JSON_FILE, as_attachment=True)
+
 @app.route('/table')
 def table():
     return render_template("table.html", headings=table_headings, data=table_data)
@@ -187,6 +191,7 @@ def startpage():
     output = output + f"Keba Wallbox version: {keba_ver}"
     output = output + '<br><a href="./download">Download Full</a>'
     output = output + '<br><a href="./download***REMOVED***">Download ***REMOVED***</a>'
+    output = output + '<br><a href="./downloadJson">Download JSON File</a>'
     output = output + '<br><a href="./update">Update</a>'
     output = output + '<br><a href="./table">Show Table</a>'
     return output
