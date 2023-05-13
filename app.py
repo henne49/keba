@@ -38,7 +38,7 @@ def data_load():
         with open(_KEBA_JSON_FILE, 'r') as fp:
             return json.load(fp)
     else:
-        os.popen("copy " + _KEBA_JSON_TEMPLATE_FILE + " " + _KEBA_JSON_FILE)
+        os.popen("cp " + _KEBA_JSON_TEMPLATE_FILE + " " + _KEBA_JSON_FILE)
         with open(_KEBA_JSON_FILE, 'r') as fp:
             return json.load(fp)
 
