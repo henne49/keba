@@ -105,6 +105,7 @@ def keba_recv(sock):
     return (payload, address)
 
 def keba_sendto(sock, msg):
+    print (_KEBA_WALLBOX_ADDR)
     sock.sendto(msg.encode('utf-8'), _KEBA_WALLBOX_ADDR)
     data, address = keba_recv(sock)
     return data.decode('utf-8')   
