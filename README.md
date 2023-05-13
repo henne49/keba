@@ -5,8 +5,6 @@ docker-compose file:
   keba:
     image: ghcr.io/henne49/keba:latest
     container_name: keba
-    networks:
-      - t3
     restart: unless-stopped
     environment:
       - KEBA_WALLBOX_IP=MY_IP
