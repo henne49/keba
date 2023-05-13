@@ -6,19 +6,17 @@ import datetime
 from flask import Flask, send_file, render_template
 #import pandas as pd
 
-_KEBA_WALLBOX_IP = "***REMOVED***"
-_KEBA_WALLBOX_PORT = 7090
+#_KEBA_WALLBOX_IP = "***REMOVED***"
+#_KEBA_WALLBOX_PORT = 7090
+#_ENERGY_PRICE = 0.49
+_KEBA_WALLBOX_IP = os.environ['KEBA_WALLBOX_IP']
+_KEBA_WALLBOX_PORT = os.environ['KEBA_WALLBOX_PORT']
+_ENERGY_PRICE = os.environ['ENERGY_PRICE']
 _KEBA_WALLBOX_ADDR = (_KEBA_WALLBOX_IP,_KEBA_WALLBOX_PORT)
 _KEBA_JSON_FILE = "/data/c-keba.json"
+_KEBA_JSON_TEMPLATE_FILE = "template.json"
 _KEBA_CSV_FILE = "c-keba-export.csv"
 _KEBA_CISCO_CSV_FILE = "***REMOVED***-keba-export.csv"
-_Price = 0.49
-
-
-#username = os.environ['MY_USER']
-#password = os.environ['MY_PASS']
-
-app = Flask(__name__)
 
 car_rfids = {
     '0000000000000000' : '***REMOVED***',
@@ -30,13 +28,18 @@ car_rfids = {
     '***REMOVED***' : '***REMOVED***'
 }
 
+#username = os.environ['MY_USER']
+#password = os.environ['MY_PASS']
+
+app = Flask(__name__)
+
 def data_load():
     if os.path.exists(_KEBA_JSON_FILE):
         with open(_KEBA_JSON_FILE, 'r') as fp:
             return json.load(fp)
     else:
-        with open(_KEBA_JSON_FILE, "w") as fp:
-            fp.write(' "{ "history": { } }" ')
+        os.popen("copy " + _KEBA_JSON_TEMPLATE_FILE + " " + _KEBA_JSON_FILE)
+        with open(_KEBA_JSON_FILE, 'r') as fp:
             return json.load(fp)
 
 def data_save(data):
@@ -137,7 +140,7 @@ def keba_updatereports(sock, data):
 
         energy = int(report['E pres']) / 10000
         report['Energy in kWh'] = str(round(energy,2)).replace('.',',')
-        report['Price in Euro'] = str(round(energy * _Price, 2)).replace('.',',')
+        report['Price in Euro'] = str(round(energy * _ENERGY_PRICE, 2)).replace('.',',')
         try:
             report['Year'] = datetime.datetime.strptime(report['started'], '%Y-%m-%d %H:%M:%S.%f').year
         except:
