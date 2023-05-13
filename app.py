@@ -197,7 +197,7 @@ def startpage():
     close_socket(sock)
     output = "<p>Keba Report Downloader</p>"
     output = output + f"Keba Wallbox version: {keba_ver}"
-    output = output + "Reports: %d" % (len(data['history']))
+    output = output + "<br>Reports: %d" % (len(data['history']))
     output = output + '<br><a href="./download">Download Full</a>'
     output = output + '<br><a href="./downloadCompanyCar">Download CompanyCar</a>'
     output = output + '<br><a href="./downloadJson">Download JSON File</a>'
