@@ -154,7 +154,7 @@ def download***REMOVED***():
    return send_file(_KEBA_CISCO_CSV_FILE, as_attachment=True)
 
 @app.route('/downloadJson')
-def download***REMOVED***():
+def downloadJson():
    return send_file(_KEBA_JSON_FILE, as_attachment=True)
 
 @app.route('/table')
