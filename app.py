@@ -14,6 +14,10 @@ _KEBA_CSV_FILE = "c-keba-export.csv"
 _KEBA_CISCO_CSV_FILE = "***REMOVED***-keba-export.csv"
 _Price = 0.49
 
+
+#username = os.environ['MY_USER']
+#password = os.environ['MY_PASS']
+
 app = Flask(__name__)
 
 car_rfids = {
@@ -196,7 +200,7 @@ def startpage():
     close_socket(sock)
     output = "<p>Keba Report Downloader</p>"
     output = output + f"Keba Wallbox version: {keba_ver}"
-    output = "Reports: %d" % (len(data['history']))
+    output = output + "Reports: %d" % (len(data['history']))
     output = output + '<br><a href="./download">Download Full</a>'
     output = output + '<br><a href="./download***REMOVED***">Download ***REMOVED***</a>'
     output = output + '<br><a href="./downloadJson">Download JSON File</a>'
