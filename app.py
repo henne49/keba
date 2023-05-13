@@ -22,7 +22,8 @@ app = Flask(__name__)
 def rfid_load():
     global car_rfids
     if os.path.exists(_KEBA_CAR_RFIDS):
-        car_rfids = json.loads(_KEBA_CAR_RFIDS)
+        with open(_KEBA_CAR_RFIDS, 'r') as fp:
+            car_rfids = json.load(fp)
     else:
         car_rfids = { }
 
