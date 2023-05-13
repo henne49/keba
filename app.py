@@ -172,6 +172,7 @@ def web_update():
     global data
     sock = init_socket()
     data = data_load()
+    rfid_load()
     keba_updatereports(sock, data)
     data_save(data)
     data_save_csv(data)
@@ -188,6 +189,7 @@ def startpage():
     sock = init_socket()
     keba_ver = keba_getversion(sock)
     data = data_load()
+    rfid_load()
     keba_updatereports(sock, data)
     data_save(data)
     data_save_csv(data)
