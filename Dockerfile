@@ -11,7 +11,6 @@ ADD static static
 ADD templates templates
 COPY app.py app.py
 COPY template.json template.json
-COPY rfids.json rfids.json
 
 RUN mkdir /data
 VOLUME /data
