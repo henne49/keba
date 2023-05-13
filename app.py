@@ -178,10 +178,10 @@ def startpage():
     global keba_ver
     sock = init_socket()
     keba_ver = keba_getversion(sock)
-    data = data_load()
-    keba_updatereports(sock, data)
-    data_save(data)
-    data_save_csv(data)
+    #data = data_load()
+    #keba_updatereports(sock, data)
+    #data_save(data)
+    #data_save_csv(data)
     close_socket(sock)
     output = "<p>Keba Report Downloader</p>"
     output = output + f"Keba Wallbox version: {keba_ver}"
