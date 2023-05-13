@@ -9,7 +9,7 @@ from flask import Flask, send_file, render_template
 _KEBA_WALLBOX_IP = "***REMOVED***"
 _KEBA_WALLBOX_PORT = 7090
 _KEBA_WALLBOX_ADDR = (_KEBA_WALLBOX_IP,_KEBA_WALLBOX_PORT)
-_KEBA_JSON_FILE = "c-keba.json"
+_KEBA_JSON_FILE = "data/c-keba.json"
 _KEBA_CSV_FILE = "c-keba-export.csv"
 _KEBA_CISCO_CSV_FILE = "***REMOVED***-keba-export.csv"
 _Price = 0.49
@@ -27,8 +27,13 @@ car_rfids = {
 }
 
 def data_load():
-    with open(_KEBA_JSON_FILE, 'r') as fp:
-        return json.load(fp)
+    if os.path.exists(_KEBA_JSON_FILE):
+        with open(_KEBA_JSON_FILE, 'r') as fp:
+            return json.load(fp)
+    else:
+        with open(_KEBA_JSON_FILE, "a") as fp:
+            fp.write(' "{ "history": {} }" ')
+            return json.load(fp)
 
 def data_save(data):
     os.rename(_KEBA_JSON_FILE,_KEBA_JSON_FILE+".bak")
@@ -184,13 +189,14 @@ def startpage():
     global keba_ver
     sock = init_socket()
     keba_ver = keba_getversion(sock)
-    #data = data_load()
-    #keba_updatereports(sock, data)
-    #data_save(data)
-    #data_save_csv(data)
+    data = data_load()
+    keba_updatereports(sock, data)
+    data_save(data)
+    data_save_csv(data)
     close_socket(sock)
     output = "<p>Keba Report Downloader</p>"
     output = output + f"Keba Wallbox version: {keba_ver}"
+    output = "Reports: %d" % (len(data['history']))
     output = output + '<br><a href="./download">Download Full</a>'
     output = output + '<br><a href="./download***REMOVED***">Download ***REMOVED***</a>'
     output = output + '<br><a href="./downloadJson">Download JSON File</a>'
