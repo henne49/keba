@@ -9,7 +9,7 @@ from flask import Flask, send_file, render_template
 _KEBA_WALLBOX_IP = "***REMOVED***"
 _KEBA_WALLBOX_PORT = 7090
 _KEBA_WALLBOX_ADDR = (_KEBA_WALLBOX_IP,_KEBA_WALLBOX_PORT)
-_KEBA_JSON_FILE = "data/c-keba.json"
+_KEBA_JSON_FILE = "/data/c-keba.json"
 _KEBA_CSV_FILE = "c-keba-export.csv"
 _KEBA_CISCO_CSV_FILE = "***REMOVED***-keba-export.csv"
 _Price = 0.49
