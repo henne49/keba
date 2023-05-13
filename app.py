@@ -4,7 +4,6 @@ import socket
 import csv
 import datetime
 from flask import Flask, send_file, render_template
-#import pandas as pd
 
 _KEBA_WALLBOX_IP = os.environ['KEBA_WALLBOX_IP']    
 _KEBA_WALLBOX_PORT = int(os.environ['KEBA_WALLBOX_PORT'])
@@ -13,17 +12,18 @@ _KEBA_WALLBOX_ADDR = (_KEBA_WALLBOX_IP,_KEBA_WALLBOX_PORT)
 _KEBA_JSON_FILE = "/data/c-keba.json"
 _KEBA_JSON_TEMPLATE_FILE = "template.json"
 _KEBA_CSV_FILE = "c-keba-export.csv"
-_KEBA_CISCO_CSV_FILE = "***REMOVED***-keba-export.csv"
+_KEBA_COMPANYCAR_CSV_FILE = "CompanyCar-keba-export.csv"
 _KEBA_CAR_RFIDS = "/data/rfids.json"
+_COMPANYCAR = os.environ['COMPANYCAR']
 
 
 app = Flask(__name__)
 
-def rfid_load()
+def rfid_load():
     global car_rfids
     if os.path.exists(_KEBA_CAR_RFIDS):
         car_rfids = json.load(_KEBA_CAR_RFIDS)
-    else
+    else:
         car_rfids = { }
 
 def data_load():
@@ -45,12 +45,12 @@ def data_save_csv(history_json):
     global table_data
     
     data_file = open(_KEBA_CSV_FILE, 'w')
-    data_file_***REMOVED*** = open(_KEBA_CISCO_CSV_FILE, 'w')
+    data_file_CompanyCar = open(_KEBA_COMPANYCAR_CSV_FILE, 'w')
     data = history_json['history']
-    data_***REMOVED*** = data = history_json['history'].copy()
+    data_CompanyCar = data = history_json['history'].copy()
     count=1
     csv_writer = csv.writer(data_file, dialect='excel', delimiter=';')
-    csv_writer_***REMOVED*** = csv.writer(data_file_***REMOVED***, dialect='excel', delimiter=';')
+    csv_writer_CompanyCar = csv.writer(data_file_CompanyCar, dialect='excel', delimiter=';')
      
     #print(sorted(data.keys(),key=int), reverse=True)
     for r in sorted(data.keys(), key=int, reverse=True):
@@ -66,11 +66,11 @@ def data_save_csv(history_json):
     count = 1
     for r in sorted(data.keys(), key=int, reverse=True):
         if count == 1:
-            header_***REMOVED*** = data_***REMOVED***[str(r)].keys()
-            csv_writer_***REMOVED***.writerow(header_***REMOVED***)
-        #Write in CSV File for ***REMOVED***
-        if (int(data_***REMOVED***[str(r)]['E pres']) > 200) and ('***REMOVED***' in data_***REMOVED***[str(r)]['Car']):
-            csv_writer_***REMOVED***.writerow(data_***REMOVED***[str(r)].values())
+            header_CompanyCar = data_CompanyCar[str(r)].keys()
+            csv_writer_CompanyCar.writerow(header_CompanyCar)
+        #Write in CSV File for CompanyCar
+        if (int(data_CompanyCar[str(r)]['E pres']) > 200) and (_COMPANYCAR in data_CompanyCar[str(r)]['Car']):
+            csv_writer_CompanyCar.writerow(data_CompanyCar[str(r)].values())
         count += 1
     #table_data.sort(key=lambda x: x[0]['Session ID'], reverse=True)
 
@@ -152,9 +152,9 @@ def keba_updatereports(sock, data):
 def download():
    return send_file(_KEBA_CSV_FILE, as_attachment=True)
 
-@app.route('/download***REMOVED***')
-def download***REMOVED***():
-   return send_file(_KEBA_CISCO_CSV_FILE, as_attachment=True)
+@app.route('/downloadCompanyCar')
+def downloadCompanyCar():
+   return send_file(_KEBA_COMPANYCAR_CSV_FILE, as_attachment=True)
 
 @app.route('/downloadJson')
 def downloadJson():
@@ -196,7 +196,7 @@ def startpage():
     output = output + f"Keba Wallbox version: {keba_ver}"
     output = output + "Reports: %d" % (len(data['history']))
     output = output + '<br><a href="./download">Download Full</a>'
-    output = output + '<br><a href="./download***REMOVED***">Download ***REMOVED***</a>'
+    output = output + '<br><a href="./downloadCompanyCar">Download CompanyCar</a>'
     output = output + '<br><a href="./downloadJson">Download JSON File</a>'
     output = output + '<br><a href="./update">Update</a>'
     output = output + '<br><a href="./table">Show Table</a>'
