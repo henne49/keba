@@ -12,7 +12,7 @@ docker-compose file:
       - KEBA_WALLBOX_IP=MY_IP
       - KEBA_WALLBOX_PORT=7090
       - ENERGY_PRICE=0.49
-      - COMPANYCAR="Company Car"
+      - COMPANYCAR=Company Car
     volumes:
       - $DOCKERDIR/keba:/data
 ```
