@@ -6,10 +6,7 @@ import datetime
 from flask import Flask, send_file, render_template
 #import pandas as pd
 
-#_KEBA_WALLBOX_IP = "***REMOVED***"
-#_KEBA_WALLBOX_PORT = 7090
-#_ENERGY_PRICE = 0.49
-_KEBA_WALLBOX_IP = os.environ['KEBA_WALLBOX_IP']
+_KEBA_WALLBOX_IP = os.environ['KEBA_WALLBOX_IP']    
 _KEBA_WALLBOX_PORT = int(os.environ['KEBA_WALLBOX_PORT'])
 _ENERGY_PRICE = float(os.environ['ENERGY_PRICE'])
 _KEBA_WALLBOX_ADDR = (_KEBA_WALLBOX_IP,_KEBA_WALLBOX_PORT)
@@ -17,21 +14,17 @@ _KEBA_JSON_FILE = "/data/c-keba.json"
 _KEBA_JSON_TEMPLATE_FILE = "template.json"
 _KEBA_CSV_FILE = "c-keba-export.csv"
 _KEBA_CISCO_CSV_FILE = "***REMOVED***-keba-export.csv"
+_KEBA_CAR_RFIDS = "/data/rfids.json"
 
-car_rfids = {
-    '0000000000000000' : '***REMOVED***',
-    '***REMOVED***' : '***REMOVED***',
-    '***REMOVED***' : '***REMOVED***',
-    '***REMOVED***' : '***REMOVED***',
-    '***REMOVED***' : '***REMOVED***',
-    '***REMOVED***' : '***REMOVED***',
-    '***REMOVED***' : '***REMOVED***'
-}
-
-#username = os.environ['MY_USER']
-#password = os.environ['MY_PASS']
 
 app = Flask(__name__)
+
+def rfid_load()
+    global car_rfids
+    if os.path.exists(_KEBA_CAR_RFIDS):
+        car_rfids = json.load(_KEBA_CAR_RFIDS)
+    else
+        car_rfids = { }
 
 def data_load():
     if os.path.exists(_KEBA_JSON_FILE):
@@ -90,8 +83,6 @@ def init_socket():
     sock.bind(server_address)
     return sock
 
-
-
 def keba_recv(sock):
     while True:
         payload, address = sock.recvfrom(4096)
@@ -105,9 +96,6 @@ def keba_recv(sock):
     return (payload, address)
 
 def keba_sendto(sock, msg):
-    print(_KEBA_WALLBOX_IP)
-    print(_KEBA_WALLBOX_PORT)
-    print(_KEBA_WALLBOX_ADDR)
     sock.sendto(msg.encode('utf-8'), _KEBA_WALLBOX_ADDR)
     data, address = keba_recv(sock)
     return data.decode('utf-8')   
@@ -124,9 +112,9 @@ def keba_getreport(sock,id):
 
 def keba_updatereports(sock, data):
     """updates data dict with latest reports"""
+    global car_rfids
     for r in range(101, 131):
         report = keba_getreport(sock,r)
-        
         try: 
             report['Car']=car_rfids[report['RFID tag']]
         except:
