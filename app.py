@@ -159,6 +159,8 @@ def downloadJson():
 
 @app.route('/table')
 def table():
+    global table_data
+    global table_headings
     return render_template("table.html", headings=table_headings, data=table_data)
 #https://www.youtube.com/watch?v=mCy52I4exTU
 
