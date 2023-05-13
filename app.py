@@ -5,10 +5,10 @@ import csv
 import datetime
 from flask import Flask, send_file, render_template
 
-_KEBA_WALLBOX_IP = os.environ['KEBA_WALLBOX_IP']    
+_KEBA_WALLBOX_IP = os.environ['KEBA_WALLBOX_IP']
 _KEBA_WALLBOX_PORT = int(os.environ['KEBA_WALLBOX_PORT'])
 _ENERGY_PRICE = float(os.environ['ENERGY_PRICE'])
-_KEBA_WALLBOX_ADDR = (_KEBA_WALLBOX_IP,_KEBA_WALLBOX_PORT)
+_KEBA_WALLBOX_ADDR = (_KEBA_WALLBOX_IP, _KEBA_WALLBOX_PORT)
 _KEBA_JSON_FILE = "/data/c-keba.json"
 _KEBA_JSON_TEMPLATE_FILE = "template.json"
 _KEBA_CSV_FILE = "c-keba-export.csv"
@@ -19,13 +19,15 @@ _COMPANYCAR = os.environ['COMPANYCAR']
 
 app = Flask(__name__)
 
+
 def rfid_load():
     global car_rfids
     if os.path.exists(_KEBA_CAR_RFIDS):
         with open(_KEBA_CAR_RFIDS, 'r') as fp:
             car_rfids = json.load(fp)
     else:
-        car_rfids = { }
+        car_rfids = {}
+
 
 def data_load():
     if os.path.exists(_KEBA_JSON_FILE):
@@ -36,24 +38,27 @@ def data_load():
         with open(_KEBA_JSON_FILE, 'r') as fp:
             return json.load(fp)
 
+
 def data_save(data):
-    os.rename(_KEBA_JSON_FILE,_KEBA_JSON_FILE+".bak")
+    os.rename(_KEBA_JSON_FILE, _KEBA_JSON_FILE+".bak")
     with open(_KEBA_JSON_FILE, 'w') as fp:
         json.dump(data, fp, indent=4)
+
 
 def data_save_csv(history_json):
     global table_headings
     global table_data
-    
+
     data_file = open(_KEBA_CSV_FILE, 'w')
     data_file_CompanyCar = open(_KEBA_COMPANYCAR_CSV_FILE, 'w')
     data = history_json['history']
     data_CompanyCar = data = history_json['history'].copy()
-    count=1
+    count = 1
     csv_writer = csv.writer(data_file, dialect='excel', delimiter=';')
-    csv_writer_CompanyCar = csv.writer(data_file_CompanyCar, dialect='excel', delimiter=';')
-     
-    #print(sorted(data.keys(),key=int), reverse=True)
+    csv_writer_CompanyCar = csv.writer(
+        data_file_CompanyCar, dialect='excel', delimiter=';')
+
+    # print(sorted(data.keys(),key=int), reverse=True)
     for r in sorted(data.keys(), key=int, reverse=True):
         if count == 1:
             header = data[str(r)].keys()
@@ -69,57 +74,68 @@ def data_save_csv(history_json):
         if count == 1:
             header_CompanyCar = data_CompanyCar[str(r)].keys()
             csv_writer_CompanyCar.writerow(header_CompanyCar)
-        #Write in CSV File for CompanyCar
+        # Write in CSV File for CompanyCar
         if (int(data_CompanyCar[str(r)]['E pres']) > 200) and (_COMPANYCAR in data_CompanyCar[str(r)]['Car']):
             csv_writer_CompanyCar.writerow(data_CompanyCar[str(r)].values())
         count += 1
-    #table_data.sort(key=lambda x: x[0]['Session ID'], reverse=True)
+    # table_data.sort(key=lambda x: x[0]['Session ID'], reverse=True)
 
 
 def init_socket():
     # Create a UDP socket and bind to ANY
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    #sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    server_address = ('0.0.0.0', _KEBA_WALLBOX_PORT) 
+    # sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    server_address = ('0.0.0.0', _KEBA_WALLBOX_PORT)
     sock.bind(server_address)
     return sock
+
 
 def keba_recv(sock):
     while True:
         payload, address = sock.recvfrom(4096)
-        if payload.startswith(b"{'E pres':"): continue
-        if payload.startswith(b"{'Plug': "): continue
-        if payload.startswith(b"{'Max curr': 0}"): continue
-        if payload.startswith(b"{'Enable sys': 0}"): continue
-        if payload.startswith(b"{'State': "): continue
+        if payload.startswith(b"{'E pres':"):
+            continue
+        if payload.startswith(b"{'Plug': "):
+            continue
+        if payload.startswith(b"{'Max curr': 0}"):
+            continue
+        if payload.startswith(b"{'Enable sys': 0}"):
+            continue
+        if payload.startswith(b"{'State': "):
+            continue
         # suspress live updates as long we can't consume them
         break
     return (payload, address)
 
+
 def keba_sendto(sock, msg):
     sock.sendto(msg.encode('utf-8'), _KEBA_WALLBOX_ADDR)
     data, address = keba_recv(sock)
-    return data.decode('utf-8')   
+    return data.decode('utf-8')
+
 
 def close_socket(sock):
     sock.close()
 
-def keba_getversion(sock):
-    return keba_sendto(sock,"i")
 
-def keba_getreport(sock,id):
+def keba_getversion(sock):
+    return keba_sendto(sock, "i")
+
+
+def keba_getreport(sock, id):
     send_data = "report %d" % id
-    return json.loads(keba_sendto(sock,send_data))
+    return json.loads(keba_sendto(sock, send_data))
+
 
 def keba_updatereports(sock, data):
     """updates data dict with latest reports"""
     global car_rfids
     for r in range(101, 131):
-        report = keba_getreport(sock,r)
-        try: 
-            report['Car']=car_rfids[report['RFID tag']]
+        report = keba_getreport(sock, r)
+        try:
+            report['Car'] = car_rfids[report['RFID tag']]
         except:
-            report['Car']= 'unknown'
+            report['Car'] = 'unknown'
 
         report.pop('Curr HW')
         report.pop('started[s]')
@@ -131,42 +147,51 @@ def keba_updatereports(sock, data):
         report.pop('Sec')
 
         energy = int(report['E pres']) / 10000
-        report['Energy in kWh'] = str(round(energy,2)).replace('.',',')
-        report['Price in Euro'] = str(round(energy * _ENERGY_PRICE, 2)).replace('.',',')
+        report['Energy in kWh'] = str(round(energy, 2)).replace('.', ',')
+        report['Price in Euro'] = str(
+            round(energy * _ENERGY_PRICE, 2)).replace('.', ',')
         try:
-            report['Year'] = datetime.datetime.strptime(report['started'], '%Y-%m-%d %H:%M:%S.%f').year
+            report['Year'] = datetime.datetime.strptime(
+                report['started'], '%Y-%m-%d %H:%M:%S.%f').year
         except:
-            report['Year'] = 0 
-        try: 
-            report['Month'] = datetime.datetime.strptime(report['started'], '%Y-%m-%d %H:%M:%S.%f').month
+            report['Year'] = 0
+        try:
+            report['Month'] = datetime.datetime.strptime(
+                report['started'], '%Y-%m-%d %H:%M:%S.%f').month
         except:
-            report['Month'] = 0 
+            report['Month'] = 0
         print(report)
         report.pop('ID')
         cur_sessionid = report['Session ID']
-        if cur_sessionid == -1: 
+        if cur_sessionid == -1:
             continue
-        data['history']["%d" % cur_sessionid]=report
+        data['history']["%d" % cur_sessionid] = report
 
 # Sending the file to the user
+
+
 @app.route('/download')
 def download():
-   return send_file(_KEBA_CSV_FILE, as_attachment=True)
+    return send_file(_KEBA_CSV_FILE, as_attachment=True)
+
 
 @app.route('/downloadCompanyCar')
 def downloadCompanyCar():
-   return send_file(_KEBA_COMPANYCAR_CSV_FILE, as_attachment=True)
+    return send_file(_KEBA_COMPANYCAR_CSV_FILE, as_attachment=True)
+
 
 @app.route('/downloadJson')
 def downloadJson():
-   return send_file(_KEBA_JSON_FILE, as_attachment=True)
+    return send_file(_KEBA_JSON_FILE, as_attachment=True)
+
 
 @app.route('/table')
 def table():
     global table_data
     global table_headings
     return render_template("table.html", headings=table_headings, data=table_data)
-#https://www.youtube.com/watch?v=mCy52I4exTU
+# https://www.youtube.com/watch?v=mCy52I4exTU
+
 
 @app.route('/update')
 def web_update():
@@ -184,6 +209,8 @@ def web_update():
     return output
 
 # ‘/’ URL is bound with Keba Version
+
+
 @app.route('/')
 def startpage():
     global keba_ver
@@ -204,4 +231,3 @@ def startpage():
     output = output + '<br><a href="./update">Update</a>'
     output = output + '<br><a href="./table">Show Table</a>'
     return output
-
