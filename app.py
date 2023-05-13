@@ -10,7 +10,7 @@ from flask import Flask, send_file, render_template
 #_KEBA_WALLBOX_PORT = 7090
 #_ENERGY_PRICE = 0.49
 _KEBA_WALLBOX_IP = os.environ['KEBA_WALLBOX_IP']
-_KEBA_WALLBOX_PORT = os.environ['KEBA_WALLBOX_PORT']
+_KEBA_WALLBOX_PORT = int(os.environ['KEBA_WALLBOX_PORT'])
 _ENERGY_PRICE = float(os.environ['ENERGY_PRICE'])
 _KEBA_WALLBOX_ADDR = (_KEBA_WALLBOX_IP,_KEBA_WALLBOX_PORT)
 _KEBA_JSON_FILE = "/data/c-keba.json"
@@ -105,7 +105,9 @@ def keba_recv(sock):
     return (payload, address)
 
 def keba_sendto(sock, msg):
-    print (_KEBA_WALLBOX_ADDR)
+    print(_KEBA_WALLBOX_IP)
+    print(_KEBA_WALLBOX_PORT)
+    print(_KEBA_WALLBOX_ADDR)
     sock.sendto(msg.encode('utf-8'), _KEBA_WALLBOX_ADDR)
     data, address = keba_recv(sock)
     return data.decode('utf-8')   
