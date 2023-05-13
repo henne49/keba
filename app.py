@@ -31,8 +31,8 @@ def data_load():
         with open(_KEBA_JSON_FILE, 'r') as fp:
             return json.load(fp)
     else:
-        with open(_KEBA_JSON_FILE, "a") as fp:
-            fp.write(' "{ "history": {} }" ')
+        with open(_KEBA_JSON_FILE, "w") as fp:
+            fp.write(' "{ "history": { } }" ')
             return json.load(fp)
 
 def data_save(data):
