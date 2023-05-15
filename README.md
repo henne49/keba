@@ -1,6 +1,8 @@
 # keba
 docker-compose file:
+create a host folder data, where the json file (database) and the rfid file are stored. So you can export and backup your charging history. 
 
+The energy price is always written for the latest 30 charging sessions, older session will stay with old pricing in the json file. 
 ```
   keba:
     image: ghcr.io/henne49/keba:latest
@@ -15,8 +17,8 @@ docker-compose file:
       - $DOCKERDIR/keba:/data
 ```
 
-rfid file, multiple RFID Token can be specified for private and company car
-
+rfids.json file, multiple RFID Token can be specified for private and company car
+stored in your data folder.
 
 ```
 {
