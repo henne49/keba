@@ -1,6 +1,6 @@
 # keba
   
-Project to load the last charging session from a Keba C Wallbox, that has no interface and allows to display as a html page and export all sessions as a CSV File and the Company Car Sessions, if used with rfid tags. 
+Project to load the last charging session from a Keba C Wallbox, that has no usable web interface. The program allows to display the sessions as a html page and exporting them as CSV File. You can define rfid tags for different cars and it allows to export Company Car Sessions separately. 
 
 Currently AMD64 Image only TODO create an ARM64 Image for MAC M1
 
