@@ -6,6 +6,9 @@ The Heavy Lifting Code was done by Stephan, https://github.com/fiebrandt Credits
 
 Currently AMD64 Image only TODO create an ARM64 Image for MAC M1
 
+<img width="1200" alt="grafik" src="https://github.com/henne49/keba/assets/4662326/2fe74e79-eccf-421f-9b00-bbc1284d693a">
+
+
 ## create a data folder
 ```
 mkdir data 
