@@ -15,4 +15,4 @@ COPY template.json template.json
 RUN mkdir /data
 VOLUME /data
 
-CMD ["python3", "-m" , "flask", "run", "--host=0.0.0.0"]
+CMD ["python3", "-m" , "flask", "run", "--host=0.0.0.0", "--port=8080"]
