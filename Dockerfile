@@ -12,7 +12,7 @@ ADD templates templates
 COPY app.py app.py
 COPY template.json template.json
 
-RUN mkdir /data
-VOLUME /data
+RUN mkdir data
+VOLUME data
 
-CMD ["python3", "-m" , "flask", "run", "--host=0.0.0.0", "--port=8080"]
+CMD ["python3", "-m" , "flask", "run", "--host=0.0.0.0", "--debug"]

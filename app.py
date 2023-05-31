@@ -5,19 +5,26 @@ import csv
 import datetime
 from flask import Flask, send_file, render_template
 
+app = Flask(__name__)
+
 _KEBA_WALLBOX_IP = os.environ['KEBA_WALLBOX_IP']
 _KEBA_WALLBOX_PORT = int(os.environ['KEBA_WALLBOX_PORT'])
 _ENERGY_PRICE = float(os.environ['ENERGY_PRICE'])
 _KEBA_WALLBOX_ADDR = (_KEBA_WALLBOX_IP, _KEBA_WALLBOX_PORT)
-_KEBA_JSON_FILE = "/data/c-keba.json"
+
 _KEBA_JSON_TEMPLATE_FILE = "template.json"
 _KEBA_CSV_FILE = "c-keba-export.csv"
 _KEBA_COMPANYCAR_CSV_FILE = "CompanyCar-keba-export.csv"
-_KEBA_CAR_RFIDS = "/data/rfids.json"
+if __name__ == "__main__":
+    _KEBA_CAR_RFIDS = "rfids.json"
+    _KEBA_JSON_FILE = "c-keba.json"
+else:
+    _KEBA_CAR_RFIDS = "data/rfids.json"
+    _KEBA_JSON_FILE = "data/c-keba.json"
 _COMPANYCAR = os.environ['COMPANYCAR']
 
 
-app = Flask(__name__)
+
 
 
 def rfid_load():
@@ -84,8 +91,8 @@ def data_save_csv(history_json):
 def init_socket():
     # Create a UDP socket and bind to ANY
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    # sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    server_address = ('0.0.0.0', _KEBA_WALLBOX_PORT)
+    #sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    server_address = ('', _KEBA_WALLBOX_PORT)
     sock.bind(server_address)
     return sock
 
@@ -234,3 +241,4 @@ def startpage():
 
 if __name__ == "__main__":
     app.run(debug=True)
+    print (__name__)
