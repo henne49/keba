@@ -231,3 +231,6 @@ def startpage():
     output = output + '<br><a href="./update">Update</a>'
     output = output + '<br><a href="./table">Show Table</a>'
     return output
+
+if __name__ == "__main__":
+    app.run(debug=True)
