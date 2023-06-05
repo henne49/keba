@@ -4,7 +4,9 @@ import socket
 import csv
 import datetime
 from flask import Flask, send_file, render_template
+from dotenv import load_dotenv
 
+load_dotenv()
 app = Flask(__name__)
 
 _KEBA_WALLBOX_IP = os.environ['KEBA_WALLBOX_IP']
@@ -22,9 +24,6 @@ else:
     _KEBA_CAR_RFIDS = "data/rfids.json"
     _KEBA_JSON_FILE = "data/c-keba.json"
 _COMPANYCAR = os.environ['COMPANYCAR']
-
-
-
 
 
 def rfid_load():
@@ -92,7 +91,7 @@ def init_socket():
     # Create a UDP socket and bind to ANY
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     #sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    server_address = ('', _KEBA_WALLBOX_PORT)
+    server_address = ('0.0.0.0', _KEBA_WALLBOX_PORT)
     sock.bind(server_address)
     return sock
 
@@ -159,12 +158,12 @@ def keba_updatereports(sock, data):
             round(energy * _ENERGY_PRICE, 2)).replace('.', ',')
         try:
             report['Year'] = datetime.datetime.strptime(
-                report['started'], '%Y-%m-%d %H:%M:%S.%f').year
+                report['ended'], '%Y-%m-%d %H:%M:%S.%f').year
         except:
             report['Year'] = 0
         try:
             report['Month'] = datetime.datetime.strptime(
-                report['started'], '%Y-%m-%d %H:%M:%S.%f').month
+                report['ended'], '%Y-%m-%d %H:%M:%S.%f').month
         except:
             report['Month'] = 0
         print(report)
@@ -203,6 +202,7 @@ def table():
 @app.route('/update')
 def web_update():
     global data
+    print('Init Socket')
     sock = init_socket()
     data = data_load()
     rfid_load()
@@ -240,5 +240,5 @@ def startpage():
     return output
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5050,debug=True)
     print (__name__)
