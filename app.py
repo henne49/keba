@@ -3,6 +3,7 @@ import os
 import socket
 import csv
 import datetime
+import time
 from flask import Flask, send_file, render_template
 from dotenv import load_dotenv
 
@@ -127,11 +128,50 @@ def close_socket(sock):
 def keba_getversion(sock):
     return keba_sendto(sock, "i")
 
+def keba_settime(sock, time):
+    return keba_sendto(sock, f"setdatetime {time}" )
 
 def keba_getreport(sock, id):
     send_data = "report %d" % id
     return json.loads(keba_sendto(sock, send_data))
 
+
+def keba_report1(sock):
+    send_data = "report 1"
+    return json.loads(keba_sendto(sock, send_data))
+
+def keba_report2(sock):
+    send_data = "report 2"
+    return json.loads(keba_sendto(sock, send_data))
+
+def keba_status_ntp(sock):
+    match keba_report1(sock)['timeQ']:
+        case 0:
+            return "No time quality. Clock was never set"
+        case 1:
+            return "Clock was set but not really synchronized"
+        case 2:
+            return "Clock was synchronized using an unreliable source"
+        case 3:
+            return "Clock was synchronized using a reliable source (NTP, OCPP, etc.)"
+        case _any:
+            return "ERROR"
+def keba_status_wallbox(sock):
+    match keba_report2(sock)['State']:
+        case 0:
+            return "Startup"
+        case 1:
+            return "Not ready for charging Charging station is not connected to a vehicle, is locked by the authorization function or another mechanism"
+        case 2:
+            return "Ready for charging and waiting for reaction from vehicle"
+        case 3:
+            return "Charging"
+        case 4:
+            return "Error is present"
+        case 5:
+            return "Charging process temporarily interrupted"
+        case _any:
+            return "ERROR"
 
 def keba_updatereports(sock, data):
     """updates data dict with latest reports"""
@@ -191,6 +231,13 @@ def downloadCompanyCar():
 def downloadJson():
     return send_file(_KEBA_JSON_FILE, as_attachment=True)
 
+@app.route('/setTime')
+def setTime():
+    print('Init Socket')
+    sock = init_socket()
+    result = keba_settime(sock,time.time())
+    close_socket(sock)
+    return result
 
 @app.route('/table')
 def table():
@@ -227,16 +274,23 @@ def startpage():
     data = data_load()
     rfid_load()
     keba_updatereports(sock, data)
+   
+    report1=keba_status_ntp(sock)
+    report2=keba_status_wallbox(sock)
+
     data_save(data)
     data_save_csv(data)
     close_socket(sock)
     output = "<p>Keba Report Downloader</p>"
     output = output + f"Keba Wallbox version: {keba_ver}"
+    output = output + "<br>" + f"{report1}"
+    output = output + "<br>" + f"{report2}"
     output = output + "<br>Reports: %d" % (len(data['history']))
     output = output + '<br><a href="./download">Download Full</a>'
     output = output + '<br><a href="./downloadCompanyCar">Download CompanyCar</a>'
     output = output + '<br><a href="./downloadJson">Download JSON File</a>'
     output = output + '<br><a href="./update">Update</a>'
+    output = output + '<br><a href="./setTime">Sync Browser Time</a>'
     output = output + '<br><a href="./table">Show Table</a>'
     return output
 
