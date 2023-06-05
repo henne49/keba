@@ -144,6 +144,13 @@ def keba_report2(sock):
     send_data = "report 2"
     return json.loads(keba_sendto(sock, send_data))
 
+def keba_report3(sock):
+    send_data = "report 3"
+    return json.loads(keba_sendto(sock, send_data))
+
+def keba_current_charge(sock):
+    return keba_report3(sock)['E pres']
+
 def keba_status_ntp(sock):
     match keba_report1(sock)['timeQ']:
         case 0:
@@ -280,11 +287,13 @@ def startpage():
 
     data_save(data)
     data_save_csv(data)
-    close_socket(sock)
+    
     output = "<p>Keba Report Downloader</p>"
     output = output + f"Keba Wallbox version: {keba_ver}"
     output = output + "<br>" + f"{status_ntp}"
     output = output + "<br>" + f"{status_wallbox}"
+    if status_wallbox == "Charging" :
+        output = output + "<br>" + keba_current_charge(sock)
     output = output + "<br>Reports: %d" % (len(data['history']))
     output = output + '<br><a href="./download">Download Full</a>'
     output = output + '<br><a href="./downloadCompanyCar">Download CompanyCar</a>'
@@ -293,6 +302,7 @@ def startpage():
     if status_ntp == "No time quality. Clock was never set" :
         output = output + '<br><a href="./setTime">Sync Browser Time</a>'
     output = output + '<br><a href="./table">Show Table</a>'
+    close_socket(sock)
     return output
 
 if __name__ == "__main__":
