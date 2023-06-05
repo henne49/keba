@@ -16,6 +16,20 @@ pwd
 ```
 docker run --publish 5050:5000 -e KEBA_WALLBOX_IP=MYIP -e KEBA_WALLBOX_PORT=7090 -e ENERGY_PRICE=0.49 -e COMPANYCAR='Company Car' ghcr.io/henne49/keba:latest
 ```
+## run from command line
+Download per Command Line
+```
+wget https://github.com/henne49/keba/archive/refs/heads/main.zip
+```
+
+Download per Browser https://github.com/henne49/keba/archive/refs/heads/main.zip && Unzip 
+
+in unzipped folder start and update .env file with IP of KEBA Wallbox, price and Company Car:
+```
+pip install -r requirements.txt
+nano .env
+python3 -m flask run --port=8080 --host=0.0.0.0
+```
 
 ## docker-compose file:
 create a host folder data, where the json file (database) and the rfid file are stored. So you can export and backup your charging history. 
