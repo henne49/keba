@@ -138,6 +138,7 @@ def keba_updatereports(sock, data):
     global car_rfids
     for r in range(101, 131):
         report = keba_getreport(sock, r)
+        print(report)
         try:
             report['Car'] = car_rfids[report['RFID tag']]
         except:
@@ -166,7 +167,7 @@ def keba_updatereports(sock, data):
                 report['ended'], '%Y-%m-%d %H:%M:%S.%f').month
         except:
             report['Month'] = 0
-        print(report)
+        #print(report)
         report.pop('ID')
         cur_sessionid = report['Session ID']
         if cur_sessionid == -1:
