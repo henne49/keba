@@ -275,22 +275,23 @@ def startpage():
     rfid_load()
     keba_updatereports(sock, data)
    
-    report1=keba_status_ntp(sock)
-    report2=keba_status_wallbox(sock)
+    status_ntp=keba_status_ntp(sock)
+    status_wallbox=keba_status_wallbox(sock)
 
     data_save(data)
     data_save_csv(data)
     close_socket(sock)
     output = "<p>Keba Report Downloader</p>"
     output = output + f"Keba Wallbox version: {keba_ver}"
-    output = output + "<br>" + f"{report1}"
-    output = output + "<br>" + f"{report2}"
+    output = output + "<br>" + f"{status_ntp}"
+    output = output + "<br>" + f"{status_wallbox}"
     output = output + "<br>Reports: %d" % (len(data['history']))
     output = output + '<br><a href="./download">Download Full</a>'
     output = output + '<br><a href="./downloadCompanyCar">Download CompanyCar</a>'
     output = output + '<br><a href="./downloadJson">Download JSON File</a>'
     output = output + '<br><a href="./update">Update</a>'
-    output = output + '<br><a href="./setTime">Sync Browser Time</a>'
+    if status_ntp == "No time quality. Clock was never set" :
+        output = output + '<br><a href="./setTime">Sync Browser Time</a>'
     output = output + '<br><a href="./table">Show Table</a>'
     return output
 
