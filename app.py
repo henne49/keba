@@ -284,16 +284,16 @@ def startpage():
    
     status_ntp=keba_status_ntp(sock)
     status_wallbox=keba_status_wallbox(sock)
-
+    charging_status=keba_current_charge(sock)
     data_save(data)
     data_save_csv(data)
-    
+    close_socket(sock)
     output = "<p>Keba Report Downloader</p>"
     output = output + f"Keba Wallbox version: {keba_ver}"
     output = output + "<br>" + f"{status_ntp}"
     output = output + "<br>" + f"{status_wallbox}"
     if status_wallbox == "Charging" :
-        output = output + "<br>" + keba_current_charge(sock)
+        output = output + "<br> Charged Energy: " +f"{round(charging_status/10000,2)}" +" kWh"
     output = output + "<br>Reports: %d" % (len(data['history']))
     output = output + '<br><a href="./download">Download Full</a>'
     output = output + '<br><a href="./downloadCompanyCar">Download CompanyCar</a>'
@@ -302,7 +302,6 @@ def startpage():
     if status_ntp == "No time quality. Clock was never set" :
         output = output + '<br><a href="./setTime">Sync Browser Time</a>'
     output = output + '<br><a href="./table">Show Table</a>'
-    close_socket(sock)
     return output
 
 if __name__ == "__main__":
