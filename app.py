@@ -285,6 +285,7 @@ def startpage():
     status_ntp=keba_status_ntp(sock)
     status_wallbox=keba_status_wallbox(sock)
     charging_status=keba_current_charge(sock)
+    
     data_save(data)
     data_save_csv(data)
     close_socket(sock)
