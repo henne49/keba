@@ -17,6 +17,7 @@ pwd
 docker run --publish 5050:5000 -e KEBA_WALLBOX_IP=MYIP -e KEBA_WALLBOX_PORT=7090 -e ENERGY_PRICE=0.49 -e COMPANYCAR='Company Car' ghcr.io/henne49/keba:latest
 ```
 ## run from command line
+# Python 3.11 required
 Download per Command Line
 ```
 wget https://github.com/henne49/keba/archive/refs/heads/main.zip
